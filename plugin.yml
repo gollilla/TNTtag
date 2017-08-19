@@ -1,0 +1,17 @@
+name: TNTtag
+main: tnttag\main
+version: 2.7.1
+api: [2.1.0]
+load: POSTWORLD
+author: gentleman
+description:
+commands:
+ sp:
+  description: "受付Mobの位置"
+ cg:
+  description: "建築モード切り替え"
+ mp:
+  description: "自分のPoint数確認"
+ prank:
+  description: "Pointのランキング"
+  
