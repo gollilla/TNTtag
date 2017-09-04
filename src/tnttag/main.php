@@ -33,8 +33,6 @@ class main extends PluginBase implements Listener
     *  @var array $game  GameStatus
     *  @var Config $con DataFiles
     *  @var Config $point PointFolder
-    *
-    *
     */
 
     public $game = [];
