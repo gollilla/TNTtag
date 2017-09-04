@@ -28,6 +28,19 @@ use pocketmine\network\protocol\InteractPacket;
 
 class main extends PluginBase implements Listener
 {
+
+   /**
+    *  @var array $game  GameStatus
+    *  @var Config $con DataFiles
+    *  @var Config $point PointFolder
+    *
+    *
+    */
+
+    public $game = [];
+    public $con = null;
+    public $point = null;
+
     public function onEnable()
     {
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
@@ -39,6 +52,7 @@ class main extends PluginBase implements Listener
         $this->point = new Config($this->getDataFolder().'point.yml', Config::YAML, array());
         $this->point->save();
     }
+
     public function load()
     {
         $this->game['status'] = 'prepare';
@@ -46,10 +60,12 @@ class main extends PluginBase implements Listener
         $this->game['count'] = 0;
         $this->game['round'] = 1;
     }
+
     public function onDisable()
     {
         $this->con->save();
     }
+
     public function onJoin(PlayerJoinEvent $ev)
     {
         $player = $ev->getPlayer();
@@ -76,10 +92,12 @@ class main extends PluginBase implements Listener
         $pk->metadata = [Entity::DATA_FLAGS => [Entity::DATA_TYPE_LONG, $flags], Entity::DATA_NAMETAG => [Entity::DATA_TYPE_STRING,'§l§cJoin to §eTNTtag!!'], Entity::DATA_LEAD_HOLDER_EID => [Entity::DATA_TYPE_LONG, -1]];
         Server::getInstance()->broadcastPacket(Server::getInstance()->getOnlinePlayers(), $pk);
     }
+
     public function onHunger(PlayerHungerChangeEvent $ev)
     {
         $ev->setCancelled();
     }
+
     public function onReceive(DataPacketReceiveEvent $ev)
     {
         $pk = $ev->getPacket();
@@ -108,6 +126,7 @@ class main extends PluginBase implements Listener
             }
         }
     }
+
     public function start()
     {
         $this->game['status'] = 'now';
@@ -141,6 +160,7 @@ class main extends PluginBase implements Listener
         $task2 = new BombTimingTask($this, 20);
         $this->getServer()->getScheduler()->scheduleRepeatingTask($task2, 20);
     }
+
     public function broadcastPopup($message)
     {
         foreach ($this->game['living'] as $name) {
@@ -148,10 +168,11 @@ class main extends PluginBase implements Listener
             if ($player instanceof Player) {
                 $player->sendPopup($message);
             } else {
-                echo "Warnig : no player such as $player on null";
+                //echo "Warnig : no player such as $player on null";
             }
         }
     }
+
     public function broadcastTip($message)
     {
         foreach ($this->game['living'] as $name) {
@@ -159,7 +180,7 @@ class main extends PluginBase implements Listener
             if ($player instanceof Player) {
                 $player->sendTip($message);
             } else {
-                echo "Warnig : no player such as $player on null";
+                //echo "Warnig : no player such as $player on null";
             }
         }
     }
@@ -236,21 +257,28 @@ class main extends PluginBase implements Listener
             $this->load();
         }
     }
+
     public function end($reason = '')
     {
         if ($reason !== '') {
-            switch ($reason) { case 'onlyone': foreach ($this->game['living'] as $name) {
-     if ($name !== null) {
-         $this->getServer()->broadcastMessage('Info§c > §b'.$name.'§6 が生き残りました');
-         $livi = $this->getServer()->getPlayer($name);
-         if ($livi instanceof Player) {
-             $livi->teleport($this->getServer()->getDefaultLevel()->getSafeSpawn());
-             $livi->sendMessage('§bInfo§f > §620Point §a手に入れました');
-             $this->addPoint($name, 20);
-         }
-     }
- } break; case 'no player': $this->getServer()->broadcastMessage('§cWarnig §f| §eプレイヤーが居なくなったのでゲームを終了します'); break; }
-            $this->load();
+            switch ($reason) { 
+                case 'onlyone': 
+                    foreach ($this->game['living'] as $name) {
+                        if ($name !== null) {
+                            $this->getServer()->broadcastMessage('Info§c > §b'.$name.'§6 が生き残りました');
+                            $livi = $this->getServer()->getPlayer($name);
+                            if ($livi instanceof Player) {
+                                $livi->teleport($this->getServer()->getDefaultLevel()->getSafeSpawn());
+                                $livi->sendMessage('§bInfo§f > §620Point §a手に入れました');
+                                $this->addPoint($name, 20);
+                             }
+                         }
+                    } 
+                 break;
+                 case 'no player': 
+                  $this->getServer()->broadcastMessage('§cWarnig §f| §eプレイヤーが居なくなったのでゲームを終了します');
+             break; }
+                $this->load();
         } else {
             $this->load();
         }
@@ -297,6 +325,7 @@ class main extends PluginBase implements Listener
             }
         }
     }
+
     public function isOni($name)
     {
         if (in_array($name, $this->game['onis'])) {
@@ -305,6 +334,7 @@ class main extends PluginBase implements Listener
             return false;
         }
     }
+
     public function onDamage(EntityDamageEvent $ev)
     {
         $tnt = Item::get(46, 0, 1);
@@ -340,6 +370,7 @@ class main extends PluginBase implements Listener
             $ev->setCancelled();
         }
     }
+
     public function Bomb()
     {
         foreach ($this->game['onis'] as $name) {
@@ -372,6 +403,8 @@ class main extends PluginBase implements Listener
             $this->end('onlyone');
         }
     }
+
+
     public function onQuit(PlayerQuitEvent $ev)
     {
         $player = $ev->getPlayer();
@@ -397,6 +430,7 @@ class main extends PluginBase implements Listener
             }
         }
     }
+
     public function onCommand(CommandSender $sender, Command $cmd, $label, array $args)
     {
         $com = $cmd->getName();
@@ -430,7 +464,9 @@ class main extends PluginBase implements Listener
      }
  } break; }
     }
-} class count extends PluginTask
+} 
+
+class count extends PluginTask
 {
     public function __construct(PluginBase $owner, $count)
     {
